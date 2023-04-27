@@ -311,5 +311,6 @@ async def transition_model_api(data: RenameModelApiData):
     return  {"result": "Model   Renamed"}
 
 
-
+def ciao():
+    return ciao
 
