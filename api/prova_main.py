@@ -11,10 +11,14 @@ from PIL import Image
 import pickle
 import mlflow.pytorch
 import requests 
+import bentoml
+#from unicorn import UnicornMiddleware
+
 
 app = FastAPI()
 mlflowclient = MlflowClient(
     mlflow.get_tracking_uri(), mlflow.get_registry_uri())
+
 
 
 #working
@@ -311,6 +315,71 @@ async def transition_model_api(data: RenameModelApiData):
     return  {"result": "Model   Renamed"}
 
 
-def ciao():
-    return ciao
 
+#runner = bentoml.mlflow.get("conv/1:latest").to_runner()
+
+#loaded_model = mlflow.pytorch.load_model("models:/conv1/1")
+#bentoml.pytorch.save_model("iris_clf", loaded_model)
+#runner = bentoml.mlflow.import_model(
+    #'mlflow_pytorch_mnist',
+   # "models:/conv1/1",
+    #signatures={'predict': {'batchable': True}}
+    #)
+
+        
+
+        # make predictions with BentoML runner
+
+#model_runner_2.init_local()
+#bento_model = bentoml.mlflow.import_model('mlflow_pytorch_mnist', "models:/conv1/1")
+#mnist_runner = bentoml.mlflow.get('bento_model:latest').to_runner()
+#loaded_model = mlflow.sklearn.load_model("models:/conv1/1")
+#bentoml.sklearn.save_model("conv1", loaded_model)
+#runner = bentoml.mlflow.get('conv1:latest').to_runner()
+
+#runner = bentoml.mlflow.get('mlflow_pytorch_mnist').to_runner()
+
+
+#runner = bentoml.mlflow.import_model(
+            #"mlflow_pytorch_mnist",
+            ##"models:/conv1/1",
+            #signatures={"predict": {"batchable": True}},
+        #).to_runner()
+#runner = bentoml.mlflow.get("mlflow_pytorch_mnist:latest").to_runner()
+bento_model_2 = bentoml.mlflow.import_model(
+    "mlflow_pytorch",
+    "models:/conv1/1",
+     signatures={"predict": {"batchable": True}},
+ )
+print("Model imported to BentoML: %s" % bento_model_2)
+model_runner_2 = bentoml.mlflow.get("mlflow_pytorch:latest").to_runner()
+
+        # make predictions with BentoML runner
+svc = bentoml.Service("conv1", runners=[model_runner_2])
+svc.mount_asgi_app(FastAPI)
+
+@app.post("/predict")
+async def predict_image():
+    image = Image.open("api/img_4.jpg")
+    img_arr = np.array(image)/255.0
+    input_arr = np.expand_dims(img_arr, 0).astype("float32")
+    output_tensor = model_runner_2.predict.run(input_arr)
+    res = int(np.argmax(output_tensor.text))
+    return {"result": res}
+    #return output_tensor.numpy()
+    #bento_model = bentoml.mlflow.import_model("mlflow_pytorch_mnist", "models:/conv1/1")
+    
+    #svc = bentoml.Service(
+        #name="pytorch_mnist_demo",
+        #runners=[runner]
+    #)
+    # Resize the image to your desired size
+    #img = np.array(image, dtype=np.float32).flatten()[np.newaxis, ...]/255
+    #output_tensor = model_runner_2.predict.async_run(img)
+    #res = int(np.argmax(output_tensor[0]))
+    #return output_tensor.numpy()
+    #return model_runner_2.predict.async_run(img)
+
+def ciao():
+    ciao = "ciao"
+    return "ciao"

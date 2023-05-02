@@ -9,7 +9,7 @@ import pickle
 import numpy as np
 from ml.data import load_cora, load_cora_dgl
 import torch.nn.functional as F
-
+import bentoml
 
 class Trainer():
     def train_model_task_conv(model_name: str):
@@ -93,6 +93,8 @@ class Trainer():
                 artifact_path="model",
                 registered_model_name="conv1",
                 )
+            
+            #bento_model = bentoml.mlflow.import_model("conv1", "models:/conv1/1")
             #save the model in docker filesystem as pkl file
             #filename = "conv_model.pkl"
             #pickle.dump(modello, open(filename, "wb"))

@@ -11,8 +11,7 @@
         AWS_ACCESS_KEY_ID: "ciao"
         AWS_SECRET_ACCESS_KEY: "ciao123456"
         #GUNICORN_CMD_ARGS: "--timeout 600"
-        MLFLOW_TRACKING_URI: http://localhost:5000
-        
+        MLFLOW_TRACKING_URI: http://localhost:5000  
       build:
         dockerfile: Dockerfile
       healthcheck:
@@ -22,8 +21,10 @@
         retries: 5
       depends_on:
         - minio
-        - fastapi 
-  
+        - fastapi
+      volumes:
+        - ./mlflow-artifact-storage:/mlflow/artifacts
+        - ./mlflow.db:/mlflow.db
   minio:
       image: minio/minio:latest
       working_dir: "/minio/storage"
@@ -52,3 +53,5 @@
       #- mlflow
     ports:
       - 8000:8000
+    volumes:
+      - ./mlflow-artifact-storage:/mlflow/storage

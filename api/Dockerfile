@@ -6,6 +6,7 @@ RUN apt-get update && \
     apt-get install -y curl \
     wget \
     openjdk-11-jre
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 COPY ./api /api
 COPY ./ml /ml
